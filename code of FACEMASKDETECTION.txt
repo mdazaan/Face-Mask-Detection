@@ -1,0 +1,47 @@
+import numpy as np
+import cv2 # pip install opencv-python
+face_cascade =cv2.CascadeClassifier('haarcascades/haarcascade_mcs_mouth.xml')
+eye_cascade = cv2.CascadeClassifier('haarcascades/haarcascade_eye.xml')
+
+# For user message
+font = cv2.FONT_HERSHEY_SIMPLEX
+org = (30, 30)
+weared_mask_font_color = ( 0, 255, 0)
+not_weared_mask_font_color = (0, 0, 255)
+thickness = 2
+font_scale = 1
+weared_mask = "Thank You for wearing MASK"
+not_weared_mask = "Please wear MASK to defeat Corona"
+
+# Read video
+cap = cv2.VideoCapture(0)
+while 1:
+    # Get individual frame
+    ret, img = cap.read()
+
+    # Convert Image into gray
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # detect face 
+    faces = face_cascade.detectMultiScale(gray, 1.9, 10)
+
+    # detect eye
+    eye = eye_cascade.detectMultiScale(gray, 1.05, 10)
+
+    if(len(faces) == 0 and len(eye) == 0):
+        pass 
+    elif(len(faces) == 0 and len(eye)>0):
+        cv2.putText(img, weared_mask, org, font, font_scale, weared_mask_font_color, thickness, cv2.LINE_AA)
+    elif(len(faces)>0):
+        cv2.putText(img, not_weared_mask, org, font, font_scale, not_weared_mask_font_color, thickness, cv2.LINE_AA)
+
+    # Show frame with results
+    cv2.imshow('Mask Detection', img)
+    k = cv2.waitKey(1) & 0xff
+    if k == 27: #27 is ascii value of 'esc' key
+        break
+
+# Release video
+cap.release()
+cv2.destroyAllWindows()
+
